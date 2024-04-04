@@ -62,6 +62,7 @@ showNewTransactions();
 **Code released under [the MIT license](https://github.com/bitpay/bitcore/blob/master/LICENSE).**
 Copyright 2013-2014 BitPay, Inc.
 
+Copyright 2018-2023 99darwin
 Copyright 2024 7h3v01c3
 
 This project is a modification of the original BitPay's bitcore library adapted for Divi RPC functionalities. While it retains the core principles and licensing of its source, it has been significantly altered to cater to the Divi blockchain network.
