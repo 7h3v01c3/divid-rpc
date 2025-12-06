@@ -1,0 +1,392 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 5a5eb58..de9ab2b 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -7,73 +7,158 @@[m [mdivid-rpc.js[m
+ [m
+ A client library to connect to Divi Core RPC in JavaScript.[m
+ [m
+[31m-## Get Started[m
+[32m+[m[32m## Requirements[m
+ [m
+[31m-divid-rpc.js runs on [node](http://nodejs.org/), and can be installed via [npm](https://npmjs.org/):[m
+[32m+[m[32m- Node.js >= 12.0.0[m
+[32m+[m[32m- npm >= 8.0.0[m
+[32m+[m
+[32m+[m[32m## Installation[m
+ [m
+ ```bash[m
+ npm install divid-rpc[m
+ ```[m
+ [m
+[32m+[m[32m## Quick Start[m
+[32m+[m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst RpcClient = require('divid-rpc');[m
+[32m+[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',[m
+[32m+[m[32m  user: 'your-rpc-user',[m
+[32m+[m[32m  pass: 'your-rpc-password',[m
+[32m+[m[32m  host: '127.0.0.1',[m
+[32m+[m[32m  port: 51473,[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32m// Simple RPC call[m
+[32m+[m[32masync function getBlockchainInfo() {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const info = await rpc.getBlockchainInfo();[m
+[32m+[m[32m    console.log('Blockchain info:', info);[m
+[32m+[m[32m  } catch (err) {[m
+[32m+[m[32m    console.error('Error:', err);[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mgetBlockchainInfo();[m
+[32m+[m[32m```[m
+[32m+[m
+ ## Examples[m
+ [m
+[32m+[m[32m### Get Block Information[m
+[32m+[m
+ ```javascript[m
+ const RpcClient = require('divid-rpc');[m
+ [m
+[31m-const config = {[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+   protocol: 'http',[m
+   user: 'user',[m
+   pass: 'pass',[m
+   host: '127.0.0.1',[m
+   port: 51473,[m
+[31m-};[m
+[31m-[m
+[31m-const rpc = new RpcClient(config);[m
+[32m+[m[32m});[m
+ [m
+[31m-async function showNewTransactions() {[m
+[32m+[m[32masync function getBlock() {[m
+   try {[m
+[31m-    const memPool = await rpc.getRawMemPool();[m
+[31m-    const newTxIds = memPool.result.filter(txid => !txids.includes(txid));[m
+[32m+[m[32m    const blockHash = await rpc.getBestBlockHash();[m
+[32m+[m[32m    const block = await rpc.getBlock(blockHash.result, true);[m
+[32m+[m[32m    console.log('Block:', block);[m
+[32m+[m[32m  } catch (err) {[m
+[32m+[m[32m    console.error(err);[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+ [m
+[31m-    if (newTxIds.length) {[m
+[31m-      const rawTransactions = await rpc.batch(() => {[m
+[31m-        newTxIds.forEach(txid => rpc.getRawTransaction(txid));[m
+[31m-      });[m
+[32m+[m[32mgetBlock();[m
+[32m+[m[32m```[m
+ [m
+[31m-      rawTransactions.forEach(rawTx => {[m
+[31m-        const tx = new bitcore.Transaction(rawTx.result);[m
+[31m-        console.log('\n\n\n' + tx.id + ':', tx.toObject());[m
+[31m-      });[m
+[32m+[m[32m### Batch RPC Calls[m
+ [m
+[31m-      txids.push(...newTxIds);[m
+[31m-    }[m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst RpcClient = require('divid-rpc');[m
+[32m+[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',[m
+[32m+[m[32m  user: 'user',[m
+[32m+[m[32m  pass: 'pass',[m
+[32m+[m[32m  host: '127.0.0.1',[m
+[32m+[m[32m  port: 51473,[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32masync function batchExample() {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const results = await rpc.batch(() => {[m
+[32m+[m[32m      rpc.getBlockCount();[m
+[32m+[m[32m      rpc.getDifficulty();[m
+[32m+[m[32m      rpc.getMempoolInfo();[m
+[32m+[m[32m    });[m
+[32m+[m[32m    console.log('Batch results:', results);[m
+   } catch (err) {[m
+     console.error(err);[m
+[31m-  } finally {[m
+[31m-    setTimeout(showNewTransactions, 2500);[m
+   }[m
+ }[m
+ [m
+[31m-showNewTransactions();[m
+[32m+[m[32mbatchExample();[m
+ ```[m
+ [m
+[31m-## License[m
+[32m+[m[32m### Using Environment Variables[m
+ [m
+[31m-**Code released under [the MIT license](https://github.com/bitpay/bitcore/blob/master/LICENSE).**[m
+[31m-Copyright 2013-2014 BitPay, Inc.[m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst RpcClient = require('divid-rpc');[m
+ [m
+[31m-Copyright 2018-2023 99darwin[m
+[31m-Copyright 2024 7h3v01c3[m
+[32m+[m[32m// RPC credentials can be set via environment variables[m
+[32m+[m[32m// RPC_USER and RPC_PASS[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',[m
+[32m+[m[32m  host: '127.0.0.1',[m
+[32m+[m[32m  port: 51473,[m
+[32m+[m[32m  // user and pass will be read from process.env.RPC_USER and process.env.RPC_PASS[m
+[32m+[m[32m});[m
+[32m+[m[32m```[m
+ [m
+[31m-This project is a modification of the original BitPay's bitcore library adapted for Divi RPC functionalities. While it retains the core principles and licensing of its source, it has been significantly altered to cater to the Divi blockchain network.[m
+[32m+[m[32m## Available RPC Methods[m
+ [m
+[32m+[m[32mThe library supports all Divi Core RPC methods including:[m
+ [m
+[31m-### Key Changes:[m
+[31m-- Updated the example code to reflect an asynchronous approach using `async/await` for better readability and error handling.[m
+[31m-- Made explicit the use of `RpcClient` with a simplified configuration object.[m
+[31m-- Clarified the license section to reflect the derivative work nature of your project, ensuring acknowledgment of the original source while stating the modifications made for Divi RPC.[m
+[32m+[m[32m- **Blockchain**: `getBlockchainInfo`, `getBlock`, `getBlockCount`, `getBlockHash`, etc.[m
+[32m+[m[32m- **Wallet**: `getBalance`, `sendToAddress`, `getNewAddress`, etc.[m
+[32m+[m[32m- **Raw Transactions**: `getRawTransaction`, `sendRawTransaction`, `createRawTransaction`, etc.[m
+[32m+[m[32m- **Network**: `getNetworkInfo`, `getPeerInfo`, `addNode`, etc.[m
+[32m+[m[32m- **Vault**: `addVault`, `fundVault`, `reclaimVaultFunds`, etc.[m
+ [m
+[31m-This update should provide a clearer, more current example for users of the `divid-rpc` library, showcasing how to interact with the Divi Core RPC server using your client.[m
+[32m+[m[32mAll methods support both Promise and callback patterns:[m
+ [m
+[32m+[m[32m```javascript[m
+[32m+[m[32m// Promise style[m
+[32m+[m[32mconst result = await rpc.getBlockCount();[m
+[32m+[m
+[32m+[m[32m// Callback style[m
+[32m+[m[32mrpc.getBlockCount((err, result) => {[m
+[32m+[m[32m  if (err) console.error(err);[m
+[32m+[m[32m  else console.log(result);[m
+[32m+[m[32m});[m
+[32m+[m[32m```[m
+ [m
+[32m+[m[32m## Configuration Options[m
+ [m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',           // 'http' or 'https'[m
+[32m+[m[32m  host: '127.0.0.1',          // RPC server host[m
+[32m+[m[32m  port: 51473,                 // RPC server port[m
+[32m+[m[32m  user: 'rpcuser',              // RPC username (or use RPC_USER env var)[m
+[32m+[m[32m  pass: 'rpcpass',              // RPC password (or use RPC_PASS env var)[m
+[32m+[m[32m  disableAgent: false,         // Disable HTTP agent reuse[m
+[32m+[m[32m  rejectUnauthorized: true,    // Reject unauthorized SSL certificates[m
+[32m+[m[32m});[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32m## License[m
+[32m+[m
+[32m+[m[32m**Code released under [the MIT license](https://github.com/bitpay/bitcore/blob/master/LICENSE).**[m
+[32m+[m
+[32m+[m[32mCopyright 2013-2014 BitPay, Inc.[m[41m  [m
+[32m+[m[32mCopyright 2018-2023 99darwin[m[41m  [m
+[32m+[m[32mCopyright 2024 7h3v01c3[m
+[32m+[m
+[32m+[m[32mThis project is a modification of the original BitPay's bitcore library adapted for Divi RPC functionalities. While it retains the core principles and licensing of its source, it has been significantly altered to cater to the Divi blockchain network.[m
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 5a5eb58..de9ab2b 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -7,73 +7,158 @@[m [mdivid-rpc.js[m
+ [m
+ A client library to connect to Divi Core RPC in JavaScript.[m
+ [m
+[31m-## Get Started[m
+[32m+[m[32m## Requirements[m
+ [m
+[31m-divid-rpc.js runs on [node](http://nodejs.org/), and can be installed via [npm](https://npmjs.org/):[m
+[32m+[m[32m- Node.js >= 12.0.0[m
+[32m+[m[32m- npm >= 8.0.0[m
+[32m+[m
+[32m+[m[32m## Installation[m
+ [m
+ ```bash[m
+ npm install divid-rpc[m
+ ```[m
+ [m
+[32m+[m[32m## Quick Start[m
+[32m+[m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst RpcClient = require('divid-rpc');[m
+[32m+[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',[m
+[32m+[m[32m  user: 'your-rpc-user',[m
+[32m+[m[32m  pass: 'your-rpc-password',[m
+[32m+[m[32m  host: '127.0.0.1',[m
+[32m+[m[32m  port: 51473,[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32m// Simple RPC call[m
+[32m+[m[32masync function getBlockchainInfo() {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const info = await rpc.getBlockchainInfo();[m
+[32m+[m[32m    console.log('Blockchain info:', info);[m
+[32m+[m[32m  } catch (err) {[m
+[32m+[m[32m    console.error('Error:', err);[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mgetBlockchainInfo();[m
+[32m+[m[32m```[m
+[32m+[m
+ ## Examples[m
+ [m
+[32m+[m[32m### Get Block Information[m
+[32m+[m
+ ```javascript[m
+ const RpcClient = require('divid-rpc');[m
+ [m
+[31m-const config = {[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+   protocol: 'http',[m
+   user: 'user',[m
+   pass: 'pass',[m
+   host: '127.0.0.1',[m
+   port: 51473,[m
+[31m-};[m
+[31m-[m
+[31m-const rpc = new RpcClient(config);[m
+[32m+[m[32m});[m
+ [m
+[31m-async function showNewTransactions() {[m
+[32m+[m[32masync function getBlock() {[m
+   try {[m
+[31m-    const memPool = await rpc.getRawMemPool();[m
+[31m-    const newTxIds = memPool.result.filter(txid => !txids.includes(txid));[m
+[32m+[m[32m    const blockHash = await rpc.getBestBlockHash();[m
+[32m+[m[32m    const block = await rpc.getBlock(blockHash.result, true);[m
+[32m+[m[32m    console.log('Block:', block);[m
+[32m+[m[32m  } catch (err) {[m
+[32m+[m[32m    console.error(err);[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+ [m
+[31m-    if (newTxIds.length) {[m
+[31m-      const rawTransactions = await rpc.batch(() => {[m
+[31m-        newTxIds.forEach(txid => rpc.getRawTransaction(txid));[m
+[31m-      });[m
+[32m+[m[32mgetBlock();[m
+[32m+[m[32m```[m
+ [m
+[31m-      rawTransactions.forEach(rawTx => {[m
+[31m-        const tx = new bitcore.Transaction(rawTx.result);[m
+[31m-        console.log('\n\n\n' + tx.id + ':', tx.toObject());[m
+[31m-      });[m
+[32m+[m[32m### Batch RPC Calls[m
+ [m
+[31m-      txids.push(...newTxIds);[m
+[31m-    }[m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst RpcClient = require('divid-rpc');[m
+[32m+[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',[m
+[32m+[m[32m  user: 'user',[m
+[32m+[m[32m  pass: 'pass',[m
+[32m+[m[32m  host: '127.0.0.1',[m
+[32m+[m[32m  port: 51473,[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32masync function batchExample() {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const results = await rpc.batch(() => {[m
+[32m+[m[32m      rpc.getBlockCount();[m
+[32m+[m[32m      rpc.getDifficulty();[m
+[32m+[m[32m      rpc.getMempoolInfo();[m
+[32m+[m[32m    });[m
+[32m+[m[32m    console.log('Batch results:', results);[m
+   } catch (err) {[m
+     console.error(err);[m
+[31m-  } finally {[m
+[31m-    setTimeout(showNewTransactions, 2500);[m
+   }[m
+ }[m
+ [m
+[31m-showNewTransactions();[m
+[32m+[m[32mbatchExample();[m
+ ```[m
+ [m
+[31m-## License[m
+[32m+[m[32m### Using Environment Variables[m
+ [m
+[31m-**Code released under [the MIT license](https://github.com/bitpay/bitcore/blob/master/LICENSE).**[m
+[31m-Copyright 2013-2014 BitPay, Inc.[m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst RpcClient = require('divid-rpc');[m
+ [m
+[31m-Copyright 2018-2023 99darwin[m
+[31m-Copyright 2024 7h3v01c3[m
+[32m+[m[32m// RPC credentials can be set via environment variables[m
+[32m+[m[32m// RPC_USER and RPC_PASS[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',[m
+[32m+[m[32m  host: '127.0.0.1',[m
+[32m+[m[32m  port: 51473,[m
+[32m+[m[32m  // user and pass will be read from process.env.RPC_USER and process.env.RPC_PASS[m
+[32m+[m[32m});[m
+[32m+[m[32m```[m
+ [m
+[31m-This project is a modification of the original BitPay's bitcore library adapted for Divi RPC functionalities. While it retains the core principles and licensing of its source, it has been significantly altered to cater to the Divi blockchain network.[m
+[32m+[m[32m## Available RPC Methods[m
+ [m
+[32m+[m[32mThe library supports all Divi Core RPC methods including:[m
+ [m
+[31m-### Key Changes:[m
+[31m-- Updated the example code to reflect an asynchronous approach using `async/await` for better readability and error handling.[m
+[31m-- Made explicit the use of `RpcClient` with a simplified configuration object.[m
+[31m-- Clarified the license section to reflect the derivative work nature of your project, ensuring acknowledgment of the original source while stating the modifications made for Divi RPC.[m
+[32m+[m[32m- **Blockchain**: `getBlockchainInfo`, `getBlock`, `getBlockCount`, `getBlockHash`, etc.[m
+[32m+[m[32m- **Wallet**: `getBalance`, `sendToAddress`, `getNewAddress`, etc.[m
+[32m+[m[32m- **Raw Transactions**: `getRawTransaction`, `sendRawTransaction`, `createRawTransaction`, etc.[m
+[32m+[m[32m- **Network**: `getNetworkInfo`, `getPeerInfo`, `addNode`, etc.[m
+[32m+[m[32m- **Vault**: `addVault`, `fundVault`, `reclaimVaultFunds`, etc.[m
+ [m
+[31m-This update should provide a clearer, more current example for users of the `divid-rpc` library, showcasing how to interact with the Divi Core RPC server using your client.[m
+[32m+[m[32mAll methods support both Promise and callback patterns:[m
+ [m
+[32m+[m[32m```javascript[m
+[32m+[m[32m// Promise style[m
+[32m+[m[32mconst result = await rpc.getBlockCount();[m
+[32m+[m
+[32m+[m[32m// Callback style[m
+[32m+[m[32mrpc.getBlockCount((err, result) => {[m
+[32m+[m[32m  if (err) console.error(err);[m
+[32m+[m[32m  else console.log(result);[m
+[32m+[m[32m});[m
+[32m+[m[32m```[m
+ [m
+[32m+[m[32m## Configuration Options[m
+ [m
+[32m+[m[32m```javascript[m
+[32m+[m[32mconst rpc = new RpcClient({[m
+[32m+[m[32m  protocol: 'http',           // 'http' or 'https'[m
+[32m+[m[32m  host: '127.0.0.1',          // RPC server host[m
+[32m+[m[32m  port: 51473,                 // RPC server port[m
+[32m+[m[32m  user: 'rpcuser',              // RPC username (or use RPC_USER env var)[m
+[32m+[m[32m  pass: 'rpcpass',              // RPC password (or use RPC_PASS env var)[m
+[32m+[m[32m  disableAgent: false,         // Disable HTTP agent reuse[m
+[32m+[m[32m  rejectUnauthorized: true,    // Reject unauthorized SSL certificates[m
+[32m+[m[32m});[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32m## License[m
+[32m+[m
+[32m+[m[32m**Code released under [the MIT license](https://github.com/bitpay/bitcore/blob/master/LICENSE).**[m
+[32m+[m
+[32m+[m[32mCopyright 2013-2014 BitPay, Inc.[m[41m  [m
+[32m+[m[32mCopyright 2018-2023 99darwin[m[41m  [m
+[32m+[m[32mCopyright 2024 7h3v01c3[m
+[32m+[m
+[32m+[m[32mThis project is a modification of the original BitPay's bitcore library adapted for Divi RPC functionalities. While it retains the core principles and licensing of its source, it has been significantly altered to cater to the Divi blockchain network.[m

@@ -38,15 +38,33 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "node_modules/.bin/mocha test -R spec",
-    "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- --recursive"
+    "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- --recursive",
+    "check-updates": "npm outdated",
+    "audit": "npm audit",
+    "audit-fix": "npm audit fix"
+  },
+  "engines": {
+    "node": ">=12.0.0",
+    "npm": ">=8.0.0"
   },
   "devDependencies": {
-    "async": "^2.4.1",
-    "chai": "^4.0.2",
+    "async": "^2.6.4",
+    "chai": "^4.3.10",
     "coveralls": "^2.13.1",
     "istanbul": "^0.4.5",
-    "mocha": "^3.4.2",
+    "mocha": "^10.0.0",
     "sinon": "^2.3.4"
+  },
+  "overrides": {
+    "minimist": "^1.2.3",
+    "qs": "^6.3.3",
+    "handlebars": "^4.0.14",
+    "js-yaml": "^3.13.1",
+    "tunnel-agent": "^0.6.0",
+    "stringstream": "^0.0.6",
+    "jsonpointer": "^5.0.0",
+    "tough-cookie": "^4.1.3",
+    "form-data": "^2.5.4"
   },
   "bugs": {
     "url": "https://github.com/divid/divid-rpc/issues"
